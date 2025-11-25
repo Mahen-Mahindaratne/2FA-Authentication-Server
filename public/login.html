@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Access - Contingency</title>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;700&family=Oswald:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --color-bg-dark: #000000;
+            --color-panel: #111111;
+            --color-accent-gold: #C6AF6B; 
+            --color-accent-gold-dark: #AA9852; 
+            --color-text-light: #F0F0F0;
+            --color-text-gray: #666666;
+            --color-border: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Oswald', sans-serif;
+            background-color: var(--color-bg-dark);
+            color: var(--color-text-light);
+            min-height: 100vh;
+            
+            display: flex;
+            justify-content: center; 
+            align-items: center;   
+            
+            padding: 40px 20px 40px 20px; 
+            overflow-x: hidden;
+            
+            background-image: radial-gradient(circle at center, rgba(198, 175, 107, 0.05) 0%, rgba(0, 0, 0, 1) 70%);
+        }
+
+        .activity-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px; 
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            border-bottom: 1px solid var(--color-accent-gold-dark);
+        }
+
+        .activity-line {
+            width: 100%;
+            height: 100%;
+            background: var(--color-accent-gold);
+            box-shadow: 0 0 10px var(--color-accent-gold), 0 0 20px rgba(198, 175, 107, 0.5);
+            transform: scaleX(0); 
+            transform-origin: left center;
+            animation: activityPulse 5s infinite cubic-bezier(0.8, 0.2, 0.2, 0.8);
+        }
+
+        @keyframes activityPulse {
+            0% { transform: scaleX(0); opacity: 0.5; }
+            10% { transform: scaleX(0.1); opacity: 0.8; }
+            40% { transform: scaleX(0.7); opacity: 1; }
+            60% { transform: scaleX(0.4); opacity: 0.9; }
+            100% { transform: scaleX(0.95); opacity: 0.5; }
+        }
+        
+        .main-layout {
+            display: flex;
+            gap: 20px;
+            width: 90%;
+            max-width: 1400px;
+            align-items: flex-start;
+        }
+        
+        .system-panel {
+            flex: 1;
+            background: var(--color-panel);
+            padding: 25px;
+            border: 1px solid var(--color-border);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            min-height: 400px;
+        }
+
+        .terminal-container {
+            flex: 2; 
+        }
+        .terminal-header {
+            background: var(--color-accent-gold-dark); 
+            color: var(--color-bg-dark);
+            padding: 10px 15px;
+            font-size: 16px;
+            font-family: 'Teko', monospace;
+            text-align: center;
+            border: 1px solid var(--color-accent-gold);
+            border-bottom: none;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+        #terminal-window {
+            width: 100%;
+            background-color: #050505;
+            border: 1px solid var(--color-accent-gold);
+            height: 400px;
+            overflow-y: scroll;
+            padding: 10px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #ccc;
+            white-space: pre-wrap;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            margin-top: 0;
+        }
+        .log-entry { display: flex; }
+        .timestamp { color: var(--color-text-gray); flex-shrink: 0; margin-right: 10px; }
+        .source { color: var(--color-accent-gold); flex-shrink: 0; margin-right: 10px; font-weight: bold; }
+        .message { flex-grow: 1; }
+        
+        .INFO { color: #5bc0de; }
+        .SUCCESS { color: #5cb85c; }
+        .WARN { color: #f0ad4e; }
+        .ERROR, .FATAL { color: var(--color-accent-gold); font-weight: bold; } 
+        .DEBUG { color: #999999; }
+        
+        .login-header h1, .success-header h1 {
+            font-family: 'Teko', monospace;
+            color: var(--color-text-light);
+            font-size: 36px;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px var(--color-accent-gold); 
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--color-accent-gold); 
+            padding-bottom: 10px;
+        }
+        
+        .security-notice {
+            background: rgba(198, 175, 107, 0.1); 
+            border: 1px solid var(--color-accent-gold-dark);
+            padding: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .security-notice h3 {
+            color: var(--color-accent-gold); 
+            font-family: 'Teko', monospace;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        
+        .form-group label {
+            color: var(--color-accent-gold); 
+        }
+        
+        .form-group input:focus {
+            border-color: var(--color-accent-gold); 
+            box-shadow: 0 0 5px var(--color-accent-gold);
+        }
+        
+        .file-input-button.has-file {
+            background: rgba(198, 175, 107, 0.1); 
+            border-color: var(--color-accent-gold);
+            color: var(--color-accent-gold);
+        }
+        
+        .file-status {
+            color: var(--color-accent-gold); 
+        }
+        
+        .login-button {
+            background: var(--color-accent-gold); 
+            color: var(--color-bg-dark);
+            border: 1px solid var(--color-accent-gold);
+        }
+
+        .login-button:hover:not(:disabled) {
+            background: var(--color-accent-gold-dark); 
+        }
+
+        .error-message {
+            background: rgba(198, 175, 107, 0.2); 
+            color: var(--color-accent-gold);
+            border: 1px solid var(--color-accent-gold);
+        }
+        
+        .user-details strong {
+            color: var(--color-accent-gold); 
+        }
+        .logout-link {
+            background: var(--color-accent-gold); 
+            color: var(--color-bg-dark);
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 8px 0;
+            background: var(--color-bg-dark);
+            border-top: 1px solid var(--color-border);
+            text-align: center;
+            font-size: 15px; 
+            font-family: 'Consolas', monospace;
+            color: var(--color-text-gray);
+            z-index: 999;
+            display: flex;
+            justify-content: center; 
+            align-items: center;
+        }
+
+        .footer-content {
+            display: flex;
+            align-items: center;
+            gap: 30px; 
+            padding: 0 20px; 
+        }
+
+        .motto-cycler {
+            color: var(--color-accent-gold);
+            font-weight: 700;
+            letter-spacing: 1px;
+            width: 250px; 
+            text-align: left;
+            height: 20px; 
+            overflow: hidden; 
+        }
+
+        .motto-cycler div {
+            transition: transform 0.3s ease-in-out;
+            line-height: 20px; 
+        }
+
+        @keyframes slideMotto {
+            0% { transform: translateY(0); }
+            25% { transform: translateY(0); }
+            
+            33.33% { transform: translateY(-100%); }
+            58.33% { transform: translateY(-100%); }
+            
+            66.66% { transform: translateY(-200%); }
+            91.66% { transform: translateY(-200%); }
+            
+            100% { transform: translateY(0); }
+        }
+
+        .motto-cycler > div {
+            animation: slideMotto 12s infinite;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="activity-bar">
+        <div class="activity-line"></div>
+    </div>
+    <div class="main-layout">
+        <div class="terminal-container system-panel">
+            <div class="terminal-header">
+                [ACCESS LOG] | NETWORK MONITOR (WEB SOCKET STREAM)
+            </div>
+            <div id="terminal-window">
+                </div>
+        </div>
+
+        <div id="login-panel" class="system-panel">
+            <div class="login-header">
+                <h1>Authentication Terminal</h1>
+                <p>MFA access required</p>
+            </div>
+            
+            <div class="security-notice">
+                <h3>CONCERN: SECURITY PROTOCOL</h3>
+                <p>Accessing this system requires multi-factor authentication. Credentials and key file are mandatory.</p>
+            </div>
+            
+            <div id="responseMessage" class="error-message" style="display: none;"></div>
+            
+            <form id="loginForm" enctype="multipart/form-data">
+                <input type="hidden" id="csrfTokenField" name="_csrf" value="pending">
+                
+                <div class="form-group">
+                    <label for="username">User ID:</label>
+                    <input type="text" id="username" name="username" required placeholder="ENTER USERNAME">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required placeholder="ENTER PASSWORD">
+                </div>
+                
+                <div class="form-group">
+                    <label for="keyFile">Key File (2FA):</label>
+                    <div class="file-input-container">
+                        <input type="file" id="keyFile" name="keyFile" class="file-input" required>
+                        <div class="file-input-button" onclick="document.getElementById('keyFile').click()">
+                            <svg class="upload-icon" viewBox="0 0 24 24">
+                                <path fill="currentColor" d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                            </svg>
+                            <span id="fileButtonText">SELECT AUTH KEY FILE</span>
+                        </div>
+                    </div>
+                    <div id="fileStatus" class="file-status"></div>
+                </div>
+                
+                <button type="submit" class="login-button" id="loginButton" disabled>
+                    <span id="buttonText">ACCESS PROTOCOL</span>
+                    <div class="loading-spinner" id="loadingSpinner"></div>
+                </button>
+            </form>
+        </div>
+
+        <div id="success-panel" class="system-panel" style="display: none;">
+            <div class="success-header">
+                <h1>ACCESS GRANTED</h1>
+                <p>Contingency protocol authorized</p>
+            </div>
+            <div class="security-notice">
+                <h3>STATUS: HIGH SECURITY ZONE</h3>
+                <p>You have successfully passed the multi-factor authentication checks.</p>
+            </div>
+            
+            <h2>Session Details:</h2>
+            <div class="user-details">
+                <p><strong>Status:</strong><span id="statusDetail">AUTHORIZED</span></p>
+                <p><strong>User ID:</strong><span id="usernameDetail"></span></p>
+                <p><strong>Session ID:</strong><span id="sessionIdDetail"></span></p>
+                <p><strong>Login Time:</strong><span id="loginTimeDetail"></span></p>
+                <p><strong>Permissions:</strong><span id="permissionsDetail">HIGH-LEVEL ASSET RETRIEVAL</span></p>
+            </div>
+            
+            <a href="#" id="logoutLink" class="logout-link">TERMINATE SESSION</a>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <span>&copy; 2025 Mahen Mahindaratne | All Rights Reserved</span>
+            
+            <div class="motto-cycler">
+                <div>FORTIS FORTUNA ADIUVAT</div>
+                <div>LUX IN TENEBRIS</div>
+                <div>FORTIS FORTUNA ADIUVAT</div>
+            </div>
+        </div>
+    </footer>
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <script>
+        const socket = io();
+        const terminal = document.getElementById('terminal-window');
+        const loginPanel = document.getElementById('login-panel');
+        const successPanel = document.getElementById('success-panel');
+        const responseMessage = document.getElementById('responseMessage');
+        const form = document.getElementById('loginForm');
+        
+        const fileInput = document.getElementById('keyFile');
+        const fileButton = document.querySelector('.file-input-button');
+        const fileButtonText = document.getElementById('fileButtonText');
+        const fileStatus = document.getElementById('fileStatus');
+        const loginButton = document.getElementById('loginButton');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const buttonText = document.getElementById('buttonText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
+        const usernameDetail = document.getElementById('usernameDetail');
+        const sessionIdDetail = document.getElementById('sessionIdDetail');
+        const loginTimeDetail = document.getElementById('loginTimeDetail');
+        const logoutLink = document.getElementById('logoutLink');
+        
+        const ACCENT_COLOR = '#C6AF6B';
+
+        function formatLogEntry(log) {
+            const date = new Date(log.timestamp);
+            const timeStr = isNaN(date.getTime()) ? '--:--:--' : date.toLocaleTimeString('en-US', {
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+            });
+            
+            const entry = document.createElement('div');
+            entry.classList.add('log-entry', log.level);
+            entry.innerHTML = 
+                `<span class="timestamp">[${timeStr}]</span>` +
+                `<span class="source">[${log.source}]</span>` +
+                `<span class="message">${log.message}</span>`;
+            
+            return entry;
+        }
+
+        function displayLog(log) {
+            const formattedEntry = formatLogEntry(log);
+            terminal.appendChild(formattedEntry);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function displayMessage(msg, type) {
+            responseMessage.textContent = msg;
+            responseMessage.className = `error-message ${type}`; 
+            responseMessage.style.display = 'block';
+        }
+        
+        displayLog({
+            level: 'INFO',
+            source: 'CLIENT',
+            message: 'Initializing connection to server log stream...',
+            timestamp: new Date().toISOString()
+        });
+
+        socket.on('serverLog', (log) => {
+            displayLog(log);
+        });
+
+        socket.on('connect', () => {
+            displayLog({
+                level: 'SUCCESS',
+                source: 'CLIENT',
+                message: `Log stream connected. Socket ID: ${socket.id}`,
+                timestamp: new Date().toISOString() 
+            });
+        });
+
+        socket.on('disconnect', () => {
+            displayLog({
+                level: 'ERROR',
+                source: 'CLIENT',
+                message: 'Connection lost. Retrying...',
+                timestamp: new Date().toISOString()
+            });
+        });
+
+        function checkFormValidity() {
+            const hasFile = fileInput.files.length > 0;
+            const hasUsername = usernameInput.value.trim() !== '';
+            const hasPassword = passwordInput.value.trim() !== '';
+            
+            loginButton.disabled = !(hasFile && hasUsername && hasPassword);
+        }
+        
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                fileButton.classList.add('has-file');
+                fileButtonText.textContent = file.name;
+                fileStatus.textContent = `File loaded: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                
+                fileStatus.style.color = ACCENT_COLOR; 
+                
+            } else {
+                fileButton.classList.remove('has-file');
+                fileButtonText.textContent = 'SELECT AUTH KEY FILE';
+                fileStatus.textContent = '';
+            }
+            checkFormValidity();
+        });
+        
+        usernameInput.addEventListener('input', checkFormValidity);
+        passwordInput.addEventListener('input', checkFormValidity);
+        checkFormValidity(); 
+
+        function showSuccessPanel(userData) {
+            usernameDetail.textContent = userData.username.toUpperCase();
+            sessionIdDetail.textContent = userData.sessionId;
+            loginTimeDetail.textContent = new Date().toLocaleString();
+            
+            loginPanel.style.display = 'none';
+            successPanel.style.display = 'block';
+
+            displayLog({
+                level: 'SUCCESS',
+                source: 'CLIENT-UI',
+                message: `Dashboard access successful for user: ${userData.username}`,
+                timestamp: new Date().toISOString()
+            });
+        }
+        
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('username', usernameInput.value);
+            formData.append('password', passwordInput.value);
+            
+            if (fileInput.files.length > 0) {
+                 formData.append('keyFile', fileInput.files[0]);
+            }
+            
+            loginButton.disabled = true;
+            buttonText.style.display = 'none';
+            loadingSpinner.style.display = 'block';
+            responseMessage.style.display = 'none';
+
+            displayLog({
+                level: 'INFO',
+                source: 'CLIENT',
+                message: `Initiating login for ${usernameInput.value}...`,
+                timestamp: new Date().toISOString()
+            });
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayLog({
+                        level: 'SUCCESS',
+                        source: 'CLIENT',
+                        message: `Server acknowledged successful login. Session ID: ${data.user.sessionId}`,
+                        timestamp: new Date().toISOString()
+                    });
+                    showSuccessPanel(data.user);
+                } else {
+                    displayLog({
+                        level: 'ERROR',
+                        source: 'CLIENT',
+                        message: `Login Failed: ${data.message || 'Unknown error'}`,
+                        timestamp: new Date().toISOString()
+                    });
+                    displayMessage(data.message || 'Authentication failed. Check logs.', 'ERROR');
+                }
+            } catch (error) {
+                displayLog({
+                    level: 'FATAL',
+                    source: 'CLIENT',
+                    message: `Network/Protocol Error: ${error.message}`,
+                    timestamp: new Date().toISOString()
+                });
+                displayMessage('System connection error. Check network.', 'ERROR');
+            } finally {
+                buttonText.style.display = 'inline';
+                loadingSpinner.style.display = 'none';
+                checkFormValidity();
+            }
+        });
+
+        logoutLink.addEventListener('click', async function(e) {
+            e.preventDefault();
+            
+            displayLog({
+                level: 'WARN',
+                source: 'CLIENT',
+                message: 'Sending session termination request...',
+                timestamp: new Date().toISOString()
+            });
+
+            try {
+                const response = await fetch('/logout', { method: 'POST' });
+                
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    window.location.reload();
+                }
+            } catch (error) {
+                displayLog({
+                    level: 'FATAL',
+                    source: 'CLIENT',
+                    message: `Logout network error: ${error.message}`,
+                    timestamp: new Date().toISOString()
+                });
+                alert('Logout failed. Please clear cookies manually.');
+            }
+        });
+    </script>
+</body>
+</html>
