@@ -213,9 +213,11 @@ Debug Checklist
 🚀 Deployment
 Development
 
-- npm run dev  # Uses nodemon for auto-reload
+````
+npm run dev  # Uses nodemon for auto-reload
 
-- npm start    # Standard Node.js execution
+npm start    # Standard Node.js execution
+````
 
 Production Considerations
 
