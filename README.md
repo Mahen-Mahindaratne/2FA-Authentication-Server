@@ -34,35 +34,36 @@ Run the setup script:
 
 ````bash
 node create-env.js
+````
 
 This generates a .env file with:
 
-    Secure session secrets (64-byte random)
+- Secure session secrets (64-byte random)
 
-    Pre-configured test users
+- Pre-configured test users
 
-    Hashed passwords using bcrypt
+- Hashed passwords using bcrypt
 
-    Key file SHA256 hashes
+- Key file SHA256 hashes
 
 Default Test Users
 
-    test/ test123 (password only)
+- test/ test123 (password only)
 
-    Admin / Admin123 (password + key file)
+- Admin / Admin123 (password + key file)
 
 🔐 Authentication Flow
 Login Process
 
-    Client Access: User visits /login page
+- Client Access: User visits /login page
 
-    Multi-Factor Input:
+- Multi-Factor Input:
 
         Username & password
 
         Key file upload (.key, .pem, .txt)
 
-    Server Validation:
+- Server Validation:
 
         Password verification via bcrypt
 
@@ -70,9 +71,9 @@ Login Process
 
         Session regeneration for security
 
-    Real-time Feedback: All steps logged via Socket.IO
+- Real-time Feedback: All steps logged via Socket.IO
 
-    Access Grant: Successful login redirects to dashboard
+- Access Grant: Successful login redirects to dashboard
 
 Session Security
 
@@ -97,134 +98,134 @@ Public Routes
 
 Protected Routes (Require Authentication)
 
-    Accessible after successful login via client-side dashboard
+- Accessible after successful login via client-side dashboard
 
 Real-time Logging
 
-    Socket.IO Connection: Real-time server logs streamed to client
+- Socket.IO Connection: Real-time server logs streamed to client
 
-    Log Levels: INFO, SUCCESS, WARN, ERROR, DEBUG, FATAL
+- Log Levels: INFO, SUCCESS, WARN, ERROR, DEBUG, FATAL
 
-    Sources: Server, Passport, Session, KeyValidation, etc.
+- Sources: Server, Passport, Session, KeyValidation, etc.
 
 🛡️ Security Features
 Multi-Factor Authentication
 
-    Password: bcrypt hashing (12 rounds)
+- Password: bcrypt hashing (12 rounds)
 
-    Key File: SHA256 hash validation
+- Key File: SHA256 hash validation
 
-    Session: Regenerated on successful login
+- Session: Regenerated on successful login
 
 File Upload Security
 
-    Allowed Types: .key, .pem, .txt files
+- Allowed Types: .key, .pem, .txt files
 
-    Size Limit: 10MB maximum
+- Size Limit: 10MB maximum
 
-    Memory Storage: No temporary disk files
+- Memory Storage: No temporary disk files
 
-    MIME Validation: Whitelisted content types
+- MIME Validation: Whitelisted content types
 
 Network Security
 
-    Security Headers:
+- Security Headers:
 
         X-Content-Type-Options: nosniff
 
         X-Frame-Options: DENY
 
-    Session Protection: HTTPOnly cookies
+- Session Protection: HTTPOnly cookies
 
 📁 Key File Requirements
 Supported Formats
 
-    Extensions: .key, .pem, .txt
+- Extensions: .key, .pem, .txt
 
-    MIME Types: application/octet-stream, text/plain
+- MIME Types: application/octet-stream, text/plain
 
-    Content: PEM encoded private keys, plain text tokens, binary keys
+- Content: PEM encoded private keys, plain text tokens, binary keys
 
 Generating Key Files
 
 🔧 Technical Details
 Core Technologies
 
-    Backend: Express.js with Passport.js authentication
+- Backend: Express.js with Passport.js authentication
 
-    Real-time: Socket.IO for live logging
+- Real-time: Socket.IO for live logging
 
-    Security: bcryptjs, SHA256 hashing
+- Security: bcryptjs, SHA256 hashing
 
-    File Handling: Multer with memory storage
+- File Handling: Multer with memory storage
 
-    Sessions: express-session with in-memory store
+- Sessions: express-session with in-memory store
 
 Server Startup
 
 The server emits detailed startup logs including:
 
-    Core technology stack
+- Core technology stack
 
-    Active middleware
+- Active middleware
 
-    Security measures
+- Security measures
 
-    Configured users and their MFA status
+- Configured users and their MFA status
 
 🐛 Troubleshooting
 Common Issues
 
-    "Invalid file type" errors
+- "Invalid file type" errors
 
-        Verify file extension is .key, .pem, or .txt
+- Verify file extension is .key, .pem, or .txt
 
-        Check file isn't corrupted
+- Check file isn't corrupted
 
-    Authentication failures
+Authentication failures
 
-        Ensure .env file exists and is properly formatted
+- Ensure .env file exists and is properly formatted
 
-        Verify password hashes match (use create-env.js)
+- Verify password hashes match (use create-env.js)
 
-        Check key file hash generation
+- Check key file hash generation
 
-    Socket.IO connection issues
+Socket.IO connection issues
 
-        Verify client connects to correct port
+- Verify client connects to correct port
 
-        Check CORS settings match your environment
+- Check CORS settings match your environment
 
 Debug Checklist
 
-    .env file exists in project root
+- .env file exists in project root
 
-    All dependencies installed (npm install)
+- All dependencies installed (npm install)
 
-    Key file exists for users requiring MFA
+- Key file exists for users requiring MFA
 
-    Server starts without errors
+- Server starts without errors
 
-    Client can connect to Socket.IO
+- Client can connect to Socket.IO
 
 🚀 Deployment
 Development
 
-npm run dev  # Uses nodemon for auto-reload
+- npm run dev  # Uses nodemon for auto-reload
 
-npm start    # Standard Node.js execution
+- npm start    # Standard Node.js execution
 
 Production Considerations
 
-    HTTPS: Set secure: true in session cookies
+- HTTPS: Set secure: true in session cookies
 
-    Session Storage: Use Redis or database instead of memory
+- Session Storage: Use Redis or database instead of memory
 
-    Environment Variables: Use production-grade secrets
+- Environment Variables: Use production-grade secrets
 
-    Process Management: Use PM2 or similar
+- Process Management: Use PM2 or similar
 
-    Reverse Proxy: Nginx/Apache for SSL termination
+- Reverse Proxy: Nginx/Apache for SSL termination
 
 📄 License
 
