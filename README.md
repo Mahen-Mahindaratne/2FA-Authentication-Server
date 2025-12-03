@@ -18,6 +18,7 @@ A secure Express.js server implementing two-factor authentication (2FA) using pa
 
 ## 📋 Project Structure
 
+````
 ├── server.js # Main Express server with Socket.IO
 ├── package.json # Dependencies and scripts
 ├── create-env.js # Environment setup utility
@@ -25,6 +26,7 @@ A secure Express.js server implementing two-factor authentication (2FA) using pa
 │ └── login.html # Authentication interface
 ├── private_key.pem # Example key file (not included)
 └── .env # Environment variables (generated)
+````
 
 ## 🔧 Configuration
 
