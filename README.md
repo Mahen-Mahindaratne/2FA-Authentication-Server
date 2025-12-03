@@ -1,200 +1,235 @@
 # 2FA Server with Key File Authentication
 
-A secure Express.js server implementing two-factor authentication (2FA) using password and key file validation. Provides robust session management, file upload validation, and enhanced security features.
-
-**2FA Server Demo | Featuring Agent 47**: 
-[![2FA Server Demo | Featuring Agent 47](https://img.youtube.com/vi/MeD7AP4FIEQ/0.jpg)](https://www.youtube.com/watch?v=MeD7AP4FIEQ)
-
-## 🌟 Features
-
-- **Dual-Factor Authentication**: Password + Key File validation
-- **Secure Session Management**: Session fixation protection with regeneration
-- **File Upload Security**: Strict file type validation and size limits
-- **Security Headers**: Built-in protection against common web vulnerabilities
-- **Comprehensive Logging**: Detailed audit trails for all operations
-- **Session Validation**: Time-based key file revalidation
-- **Localhost Debug Endpoints**: Safe debugging capabilities
+A secure Express.js server implementing two-factor authentication (2FA) using password and key file validation. Features real-time logging via Socket.IO, robust session management, and enhanced security measures.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
+- Node.js
 - npm or yarn
-- Environment variables configured
 
 ### Installation
 
 1. Clone the repository
-2. Run `npm install`
-3. Configure environment variables
-4. Start with `npm start`
+2. Install dependencies: `npm install`
+3. Generate environment file: `node create-env.js`
+4. Start the server: `npm start` (or `npm run dev` for development)
 
-## 📁 File Upload Requirements
+## 📋 Project Structure
 
-### Supported File Types
+├── server.js # Main Express server with Socket.IO
+├── package.json # Dependencies and scripts
+├── create-env.js # Environment setup utility
+├── public/
+│ └── login.html # Authentication interface
+├── private_key.pem # Example key file (not included)
+└── .env # Environment variables (generated)
 
-**MIME Types:**
-- `application/octet-stream`
-- `text/plain`
-- `application/x-x509-ca-cert`
-- `application/pkix-cert`
+## 🔧 Configuration
 
-**Extensions:** `.key`, `.pem`, `.txt`
+### Environment Setup
 
-**Maximum Size:** 10MB
+Run the setup script:
 
-### Key File Format
+````bash
+node create-env.js
 
-Key files should be in one of these formats:
-- PEM encoded private keys
-- Plain text token files
-- Binary key files
-- Certificate files
+This generates a .env file with:
 
-## 🔐 Authentication Flow
+    Secure session secrets (64-byte random)
 
-1. **Initial Request**: User accesses protected resource
-2. **Redirect to Login**: Unauthenticated users are redirected to `/login`
-3. **Credential Submission**: User provides username, password, and key file
-4. **Validation Process**:
-   - Password verification using bcrypt
-   - Key file SHA256 hash comparison
-   - Session regeneration for security
-5. **Session Establishment**: Successful login creates validated session
-6. **Access Grant**: User redirected to `/dashboard`
+    Pre-configured test users
 
-## 🛡️ Security Features
+    Hashed passwords using bcrypt
 
-### Session Security
+    Key file SHA256 hashes
 
-- **Session Regeneration**: New session ID on login to prevent fixation
-- **HTTPOnly Cookies**: Prevents client-side script access
-- **Secure Validation**: Key file validation tied to session
-- **Time-based Expiry**: 24-hour key validation limit
+Default Test Users
 
-### File Upload Security
+    test/ test123 (password only)
 
-- **Strict Type Checking**: Whitelisted MIME types and extensions
-- **Size Limits**: Prevents resource exhaustion attacks
-- **Memory Storage**: No temporary files on disk
-- **Hash Verification**: Cryptographic validation of key files
+    Admin / Admin123 (password + key file)
 
-### Network Security
+🔐 Authentication Flow
+Login Process
 
-- **Security Headers**:
-  - `X-Content-Type-Options: nosniff`
-  - `X-Frame-Options: DENY`
-- **Localhost Restrictions**: Debug endpoints limited to localhost
+    Client Access: User visits /login page
 
-## 📊 API Endpoints
+    Multi-Factor Input:
 
-### Public Endpoints
+        Username & password
 
-- `GET /` - Root redirect (to login or dashboard)
-- `GET /login` - Login page
-- `POST /login` - Authentication processing
-- `GET /logout` - Logout redirect
+        Key file upload (.key, .pem, .txt)
 
-### Protected Endpoints (Require Authentication)
+    Server Validation:
 
-- `GET /dashboard` - User dashboard
-- `GET /api/user` - Current user information
-- `POST /logout` - Logout processing
+        Password verification via bcrypt
 
-### Debug Endpoints (Localhost Only)
+        Key file SHA256 hash comparison
 
-- `GET /debug` - Session and validation state information
+        Session regeneration for security
 
-## 🔍 Monitoring and Logging
+    Real-time Feedback: All steps logged via Socket.IO
 
-The server provides comprehensive logging for all operations and security events.
+    Access Grant: Successful login redirects to dashboard
 
-## 🚨 Error Handling
+Session Security
 
-### Common Error Scenarios
+    New session ID generated on login (prevents fixation)
 
-- **Invalid Credentials**: Redirect to `/login?error=1`
-- **Missing Key File**: Clear error message
-- **Invalid File Type**: Specific rejection reasons
-- **Session Timeout**: Automatic redirect to login
-- **Key Validation Expired**: Requires re-authentication
+    24-hour session duration
 
-## 👥 User Management
+    HTTPOnly cookies
 
-### Adding New Users
+    Key validation timestamp tracking
 
-1. Increment the user counter in environment variables
-2. Generate password hash using bcrypt
-3. Generate key file SHA256 hash
-4. Restart server
+🌐 API Endpoints
+Public Routes
 
-### Customization Points
+    GET / - Root (redirects to login)
 
-- File size limits in multer configuration
-- Session duration in cookie settings
-- Allowed file types in upload filter
-- Key validation timeout period
+    GET /login - Login page
 
-## 📝 Troubleshooting
+    POST /login - Authentication endpoint
 
-### Common Issues
+    POST /logout - Logout and session cleanup
 
-**"Invalid file type" errors:**
-- Verify file extension is in allowed list
-- Check file MIME type
-- Ensure file isn't corrupted
+Protected Routes (Require Authentication)
 
-**Authentication failures:**
-- Verify password hashing matches
-- Check key file hash generation
-- Confirm environment variables are loaded
+    Accessible after successful login via client-side dashboard
 
-**Session issues:**
-- Check SESSION_SECRET is set
-- Verify cookie settings match deployment
-- Clear browser cookies if needed
+Real-time Logging
 
-### Debug Checklist
+    Socket.IO Connection: Real-time server logs streamed to client
 
-- [ ] Environment variables loaded
-- [ ] User credentials properly hashed
-- [ ] Key files generate correct SHA256 hashes
-- [ ] File uploads meet type/size requirements
-- [ ] Session secret is sufficiently random
+    Log Levels: INFO, SUCCESS, WARN, ERROR, DEBUG, FATAL
 
-## 🔒 Production Considerations
+    Sources: Server, Passport, Session, KeyValidation, etc.
 
-### Security Hardening
+🛡️ Security Features
+Multi-Factor Authentication
 
-- Use HTTPS in production
-- Set `secure: true` in session cookies
-- Implement rate limiting
-- Add CSRF protection
-- Use environment-specific configuration
+    Password: bcrypt hashing (12 rounds)
 
-### Performance
+    Key File: SHA256 hash validation
 
-- Implement session storage (Redis, etc.)
-- Add file upload streaming for large files
-- Consider CDN for static assets
-- Implement clustering for high availability
+    Session: Regenerated on successful login
 
-### Monitoring
+File Upload Security
 
-- Log aggregation and analysis
-- Session metrics tracking
-- Failed authentication alerts
-- File upload statistics
+    Allowed Types: .key, .pem, .txt files
 
-## 📄 License
+    Size Limit: 10MB maximum
 
-This project is for secure authentication implementations. Ensure compliance with your organization's security policies and applicable regulations.
+    Memory Storage: No temporary disk files
 
-> **Note**: This server implements security best practices but should be thoroughly tested in your specific environment before production deployment.
+    MIME Validation: Whitelisted content types
 
----
+Network Security
 
-**Key File Generation**: Learn how to generate key files by checking out my [Hashnode blog](https://the-ghost-protocol.hashnode.space/the-ghost-protocol/rsa-key-generation-instructions).
+    Security Headers:
 
-**Environment Setup**: Run `create-env.js` in the root directory along with your key file to generate environment variables as a `.env` file. Passwords are encrypted using bcrypt, key files are hashed with SHA256, and a 64-byte random session secret is generated.
+        X-Content-Type-Options: nosniff
+
+        X-Frame-Options: DENY
+
+    Session Protection: HTTPOnly cookies
+
+📁 Key File Requirements
+Supported Formats
+
+    Extensions: .key, .pem, .txt
+
+    MIME Types: application/octet-stream, text/plain
+
+    Content: PEM encoded private keys, plain text tokens, binary keys
+
+Generating Key Files
+
+🔧 Technical Details
+Core Technologies
+
+    Backend: Express.js with Passport.js authentication
+
+    Real-time: Socket.IO for live logging
+
+    Security: bcryptjs, SHA256 hashing
+
+    File Handling: Multer with memory storage
+
+    Sessions: express-session with in-memory store
+
+Server Startup
+
+The server emits detailed startup logs including:
+
+    Core technology stack
+
+    Active middleware
+
+    Security measures
+
+    Configured users and their MFA status
+
+🐛 Troubleshooting
+Common Issues
+
+    "Invalid file type" errors
+
+        Verify file extension is .key, .pem, or .txt
+
+        Check file isn't corrupted
+
+    Authentication failures
+
+        Ensure .env file exists and is properly formatted
+
+        Verify password hashes match (use create-env.js)
+
+        Check key file hash generation
+
+    Socket.IO connection issues
+
+        Verify client connects to correct port
+
+        Check CORS settings match your environment
+
+Debug Checklist
+
+    .env file exists in project root
+
+    All dependencies installed (npm install)
+
+    Key file exists for users requiring MFA
+
+    Server starts without errors
+
+    Client can connect to Socket.IO
+
+🚀 Deployment
+Development
+
+npm run dev  # Uses nodemon for auto-reload
+
+npm start    # Standard Node.js execution
+
+Production Considerations
+
+    HTTPS: Set secure: true in session cookies
+
+    Session Storage: Use Redis or database instead of memory
+
+    Environment Variables: Use production-grade secrets
+
+    Process Management: Use PM2 or similar
+
+    Reverse Proxy: Nginx/Apache for SSL termination
+
+📄 License
+
+ISC License. For secure authentication implementations only.
+
+Note: This implementation is for demonstration purposes. Always conduct security audits before production deployment.
+
+Environment Setup: Run create-env.js in the root directory along with your key file to generate environment variables as a .env file. Passwords are encrypted using bcrypt, key files are hashed with SHA256, and a 64-byte random session secret is generated.

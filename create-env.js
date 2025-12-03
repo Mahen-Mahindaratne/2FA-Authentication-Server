@@ -26,13 +26,13 @@ SESSION_SECRET=${sessionSecret}
   // Default users setup (you can modify these)
   const users = [
     {
-      username: 'admin',
-      password: 'admin123',
+      username: 'test',
+      password: 'test123',
       keyFile: null
     },
     {
-      username: 'Tobias Reiper',
-      password: 'Ort-Myre', 
+      username: 'Admin',
+      password: 'admin123', 
       keyFile: 'private_key.pem' // Your key file
     }
   ];

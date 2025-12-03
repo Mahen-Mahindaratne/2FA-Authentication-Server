@@ -219,38 +219,6 @@
             gap: 30px; 
             padding: 0 20px; 
         }
-
-        .motto-cycler {
-            color: var(--color-accent-gold);
-            font-weight: 700;
-            letter-spacing: 1px;
-            width: 250px; 
-            text-align: left;
-            height: 20px; 
-            overflow: hidden; 
-        }
-
-        .motto-cycler div {
-            transition: transform 0.3s ease-in-out;
-            line-height: 20px; 
-        }
-
-        @keyframes slideMotto {
-            0% { transform: translateY(0); }
-            25% { transform: translateY(0); }
-            
-            33.33% { transform: translateY(-100%); }
-            58.33% { transform: translateY(-100%); }
-            
-            66.66% { transform: translateY(-200%); }
-            91.66% { transform: translateY(-200%); }
-            
-            100% { transform: translateY(0); }
-        }
-
-        .motto-cycler > div {
-            animation: slideMotto 12s infinite;
-        }
     </style>
 </head>
 <body>
@@ -340,12 +308,6 @@
     <footer class="footer">
         <div class="footer-content">
             <span>&copy; 2025 Mahen Mahindaratne | All Rights Reserved</span>
-            
-            <div class="motto-cycler">
-                <div>FORTIS FORTUNA ADIUVAT</div>
-                <div>LUX IN TENEBRIS</div>
-                <div>FORTIS FORTUNA ADIUVAT</div>
-            </div>
         </div>
     </footer>
     <script src="/socket.io/socket.io.js"></script>
