@@ -79,13 +79,13 @@ Login Process
 
 Session Security
 
-    New session ID generated on login (prevents fixation)
+- New session ID generated on login (prevents fixation)
 
-    24-hour session duration
+- 24-hour session duration
 
-    HTTPOnly cookies
+- HTTPOnly cookies
 
-    Key validation timestamp tracking
+- Key validation timestamp tracking
 
 🌐 API Endpoints
 Public Routes
